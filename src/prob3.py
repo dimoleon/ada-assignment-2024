@@ -2,7 +2,6 @@ import numpy as np
 
 def breakString(n, L):
     m = len(L)
-    L = [x - 1 for x in L]
     L = [-1] + L + [n-1]
 
     cost = np.full(shape=(m+2, m+2), fill_value=np.inf)
@@ -22,4 +21,4 @@ def breakString(n, L):
 
             cost[i, j] = minimum
 
-    print("Minimal cost is %f" % cost[0, m+1])
+    return cost[0, m+1]
