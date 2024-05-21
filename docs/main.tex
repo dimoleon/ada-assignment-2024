@@ -14,13 +14,13 @@
 \setlength{\parindent}{0pt}
 
 % Useful packages
-\usepackage{listings}
 \usepackage{graphicx}
 \graphicspath{{./media/}}
 \usepackage{subfig}
 \usepackage{float}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{siunitx}
+\usepackage{minted}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
 % \usepackage{sectsty}
 % \sectionfont{\fontsize{12}{15}\selectfont}
 
@@ -30,7 +30,7 @@
 
 \author{Ομάδα 54 \\
         Ιωάννης Δημουλιός 10641 \\
-        Χριστόφορος Μαρινόπουλος ΑΕΜ}
+        Χριστόφορος Μαρινόπουλος 10522}
 \date{Εαρινό εξάμηνο 2024}
 
 \lhead{Προαιρετική Εργασία}
@@ -60,19 +60,57 @@
 \[
     f(p) = \max_{e\in p} l_e
 \]
-και αν \(w(\cdot)\) η συνάρτηση βάρους μια κορυφής, τότε 
+και αν \(w(\cdot)\) η συνάρτηση βάρους μιας κορυφής, τότε 
 \[
     w(v) = \min_{p\in P} f(p)
 \]
 
 . O αλγόριθμος, λοιπόν, βρίσκει και το ζητούμενο \(w(t)\).
 
-Το μόνο που χρειάζεται να αλλάξουμε στην υλοποίηση σε σύγκριση με τον κλασικό Dijkstra είναι η συνάρτηση ``χαλάρωσης'', ώστε να αντικατοπτριστεί η παραπάνω αλλαγή. 
+Το μόνο που χρειάζεται να αλλάξουμε στην υλοποίηση σε σύγκριση με τον κλασικό Dijkstra είναι η συνάρτηση ``χαλάρωσης'', ώστε να αντικατοπτριστεί η παραπάνω αλλαγή (βλ. σχετικό παράρτημα). 
 
 Η χρονική πολυπλοκότητα του Dijkstra, εφόσον η ουρά προτεραιότητας που απαιτείται υλοποιηθεί με δυαδικό σωρό (binary heap), είναι \(O((|V| + |E|)\log |V|)\). \hfill \blacksquare 
 
 \newpage
 \section*{Πρόβλημα 2 }
+Έστω ότι η ουρά εξυπηρέτησης αποτελείται απο $n$ πολίτες και ο χρόνος αναμονής του κάθε πολίτη $i$ είναι $A_{i}$ για \(1 \leq i \leq n\).
+Ο χρόνος αναμονής του $i$-οστού πολίτη ($A_{i}$) για  είναι το άθροισμα των χρόνων εξυπηρέτησης των πολιτών που εξυπηρετούνται πριν απο αυτόν. Εάν ο χρόνος εξυπηρέτησης του $i$-οστού πολίτη είναι ίσος με $S_{i}$ και ορίσουμε κατά σύμβαση $S_0 = 0$, τότε 
+\[
+A_{i} = S_{0} + S_{1} + S_{2} + ... + S_{i-1}
+\]
+. Ο συνολικός χρόνος αναμονής είναι το άθροισμα των χρόνων αναμονής κάθε πολίτη που ανήκει στην ουρά. 
+
+
+
+Είναι λογικό, λοιπόν, πως για αυτή την ουρά ο συνολικός χρόνος αναμονής είναι ίσος με:
+\begin{align*}
+    t(n) &= A_{1} + A_{2} + ... + A_{n} \\
+         &= (n-1)S_{1} + (n-2)S_{2} + ... + S_{n-1}
+\end{align*}
+
+
+Έστω μία ουρά αναμονής πλήθους n πολιτών με συνολικό χρόνο εξυπηρέτησης $t_{1}(n)$ η οποία δεν είναι ταξινομημένη κατά αύξουσα σειρά χρόνου εξυπηρέτησης κάθε πολίτη.
+
+Τότε, υπάρχει σε αυτή τουλάχιστον ένα ζευγάρι πολιτών $(x,y)$ με $x < y$ τέτοιο ώστε $S_{x} > S_{y}$ (συνθήκη \textbf{Σ}), οπότε
+\[
+t_{1}(n) = (n-1)S_{1} + (n-2)S_{2} + ... + (n-x)S_{x} + ... +  (n-y)S_{y} + ... + S_{n-1}
+\]
+. Εάν αλλάξουμε την θέση του $x$ με τον $y$, ο νέος συνολικός χρόνος εξυπηρέτησης $t_2(n)$ αυτής της ουράς θα είναι:
+\begin{align*}
+    t_{2}(n) &= (n-1)S_{1} + (n-2)S_{2} + ... + (n-x)S_{y} + ... +  (n-y)S_{x} + ... + S_{n-1} \\
+             &= t_{1}(n) - (y-x)(S_{x}-S_{y})
+\end{align*}
+
+
+Αφού $x < y$ και $S_{x} > S_{y}$, προκύπτει ότι 
+$$- (y-x)(S_{x}-S_{y}) < 0 \implies t_{2}(n) < t_{1}(n)$$
+
+
+. Κάνουμε ``άπληστα'' εναλλαγές ζευγαριών πολιτών $(x, y)$ που ικανοποιούν τη συνθήκη \textbf{Σ}, έως ότου να μην υπάρχει άλλο τέτοιο ζεύγος, δηλαδή η ουρά να έχει ταξινομηθεί. Μετά από κάθε εναλλαγή ο συνολικός χρόνος αναμονής με βάση τα παραπάνω μειώνεται και άρα ελαχιστοποιείται ακριβώς όταν η ουρά ταξινομηθεί. 
+
+Αποδείξαμε, λοιπόν, ότι αρκεί να ταξινομήσουμε τους πολιτές κατά αύξοντα χρόνο εξυπηρέτησης. 
+
+Ένας αποδοτικός αλγόριθμος για την ταξινόμηση της ουράς εξυπηρέτησης είναι heap sort, αφού έχει χρονική πολυπλοκότητα $O(n\log n)$. \hfill \blacksquare
 
 \newpage
 \section*{Πρόβλημα 3} 
@@ -112,7 +150,7 @@ Tότε \(S = S_{0, m+1}\).
     d_{i,j} &= \min_{i < k < j} \left( (d_{i,k} + b_k - b_i) + (d_{k,j} + b_j - b_k) \right) \\
             &= \min_{i < k < j} \left( d_{i,k}+ d_{k,j} + b_j - b_i \right)
 \end{align*}
-. Υπολογίζουμε, έτσι, με τη χρήση δυναμικού προγραμματισμού τον πίνακα \(D\) ξεκινώντας από την κύρια διαγώνιό του, προσπελαύνοντας τις διαγωνίους σταθερής διαφοράς δεικτών, έως ότου φτάσουμε στο στοιχείο \(d_{0, m+1}\). 
+. Υπολογίζουμε, έτσι, με τη χρήση δυναμικού προγραμματισμού τα στοιχεία του πίνακα \(D\) πάνω από την κύρια διαγώνιό του, προσπελαύνοντας τις διαγωνίους σταθερής διαφοράς δεικτών, έως ότου φτάσουμε στο στοιχείο \(d_{0, m+1}\). 
 
 \bigskip
 Η χρονική πολυπλοκότητα του αλγορίθμου προκύπτει ως εξής: 
@@ -121,4 +159,126 @@ Tότε \(S = S_{0, m+1}\).
     \item Για τον υπολογισμό κάθε \(d_{i,j}\) έχουμε έναν βρόχο με το πολύ \(m\) επαναλήψεις, άρα \(O(m)\).
 \end{itemize}
 Επομένως, τελικά είναι \(O(m^3)\). \hfill \blacksquare
+
+\newpage
+\section*{Παράρτημα}
+Παραθέτουμε ενδεικτικές υλοποιήσεις σε Python για κάθε πρόβλημα. 
+\subsection*{Πρόβλημα 1}
+\textbf{Ερώτημα 1} \\
+Ο αλγόριθμος \texttt{dfs} υλοποείται αναδρομικά. 
+Τα ορίσματα της συνάρτησης  είναι τα εξής:
+\begin{itemize}
+    \item \texttt{graph}, δομή dictionary και αναπαριστά την λίστα γειτνίασης του γράφου $G$,
+    \item \texttt{s}, κόμβος έναρξης του αλγορίθμου, 
+    \item \texttt{t}, κόμβος προορισμού, 
+    \item \texttt{L}, μέγιστη απόσταση μεταξύ δύο διαδοχικών πόλεων, 
+    \item \texttt{visited}, βοηθητικός πίνακας που αποθηκεύει τις πόλεις που έχουμε επισκεφτεί.
+\end{itemize}
+Επιστρέφει \texttt{True} αν είναι δυνατή η μετάβαση από την πόλη $s$ στην πόλη $t$, αλλιώς \texttt{False}. 
+
+\begin{minted}[linenos]{python}
+def dfs(graph, s, t, L, visited = set()):
+    if s == t:
+        return True
+    visited.add(s)
+    
+    for adj, length in graph[s]:
+        if length <= L and adj not in visited:
+            if dfs(graph, adj, t, L, visited):
+                return True
+    
+    return False
+\end{minted}
+
+\newpage
+\textbf{Ερώτημα 2}\\
+Τα ορίσματα της συνάρτησης είναι τα εξής:
+\begin{itemize}
+    \item \texttt{graph}, δομή dictionary και αναπαριστά την λίστα γειτνίασης του γράφου $G$,
+    \item \texttt{s}, κόμβος έναρξης του αλγορίθμου, 
+    \item \texttt{t}, κόμβος προορισμού.
+\end{itemize}
+O αλγόριθμος επιστρέφει το ελάχιστο δυνατό $L$, εφόσον είναι δυνατή η μετάβαση από την πόλη $s$ στην πόλη πόλη $t$, αλλιώς επιστρέφει άπειρο. 
+
+Η νέα ρουτίνα ``χαλάρωσης'' φαίνεται στη σειρά 16. 
+\begin{minted}[linenos]{python}
+import heapq
+
+def dijkstra(graph, s, t):
+    priority_queue = [(0, s)]  
+
+    weights = {v: float('inf') for v in graph}
+    weights[s] = 0
+
+    while priority_queue:
+        weight, v = heapq.heappop(priority_queue)
+
+        if v == t:
+            return weight
+
+        for adj, length in graph[v]:
+            weight_updated = max(weight, length)
+
+            if weight_updated < weights[adj]:
+                weights[adj] = weight_updated
+                heapq.heappush(priority_queue, (weight_updated, adj))
+
+    return float('inf') 
+\end{minted}
+
+\newpage 
+\subsection*{Πρόβλημα 2}
+Η συνάρτηση \texttt{heapSort} παίρνει ως όρισμα τον πίνακα \texttt{arr} με τους χρόνους εξυπηρέτησης και τον ταξινομεί χρησιμοποιώντας τη βοηθητική συνάρτηση \texttt{heapify}.
+\begin{minted}[linenos]{python}
+def heapify(arr, n, i):
+	largest = i # Initialize largest as root
+	l = 2 * i + 1 # left = 2*i + 1
+	r = 2 * i + 2 # right = 2*i + 2
+	if l < n and arr[i] < arr[l]:
+		largest = l
+	if r < n and arr[largest] < arr[r]:
+		largest = r
+	if largest != i:
+		(arr[i], arr[largest]) = (arr[largest], arr[i])
+		heapify(arr, n, largest)
+
+def heapSort(arr):
+	n = len(arr)
+	for i in range(n // 2, -1, -1):
+		heapify(arr, n, i)
+	for i in range(n - 1, 0, -1):
+		(arr[i], arr[0]) = (arr[0], arr[i]) # swap
+		heapify(arr, i, 0)
+\end{minted}
+
+\newpage
+\subsection*{Πρόβλημα 3} 
+Ο αλγόριθμος \texttt{breakString} παίρνει ως όρισμα το μήκος της συμβολοσειράς \texttt{n} και τον πίνακα των θέσεων των τομών \texttt{B} και επιστρέφει τo ελάχιστο υπολογιστικό κόστος σε μονάδες χρόνου για να γίνουν οι ζητούμενες τομές στη συμβολοσειρά. 
+\begin{minted}[linenos]{python}
+import numpy as np
+
+def breakString(n, B):
+    m = len(B)
+    B = [-1] + B + [n-1]
+
+    time_units = np.full(shape=(m+2, m+2), fill_value=np.inf)
+
+    for i in range(m+1):
+        time_units[i, i+1] = 0
+
+    for delta in range(2, m + 2):
+        for i in range(0, m + 2 - delta):
+            j = i + delta
+
+            minimum = np.inf
+            for k in range(i+1, j):
+                time_curr = time_units[i, k] + time_units[k, j] + B[j] - B[i]
+                if time_curr < minimum:
+                    minimum = time_curr
+
+            time_units[i, j] = minimum
+
+    return time_units[0, m+1]
+\end{minted}
 \end{document}
+
